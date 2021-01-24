@@ -33,7 +33,7 @@ export class AdminComponent implements OnInit {
    * FIXME : Not working
    */
   async loadWebSocket() {
-    const r = this.webSocket.connect();
+    await this.webSocket.connect();
     // update user on state change
     this.webSocket.subscribe('/workflow/states', (user) => {
       this.loadUsers();

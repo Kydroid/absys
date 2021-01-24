@@ -44,8 +44,12 @@ export class LoginComponent implements OnInit {
     }
     try {
       this.user = await this.userService.login(this.id);
-      this.messageService.add({severity: 'success', summary: 'Login', detail: 'You have been logged'});
-      await this.loadWebSocket();
+      if (this.user == null) {
+        this.messageService.add({severity: 'warn', summary: 'Login', detail: 'This ID does not exist. Please, retry.'});
+      } else {
+        this.messageService.add({severity: 'success', summary: 'Login', detail: 'You have been logged'});
+        await this.loadWebSocket();
+      }
     } catch (e) {
       this.messageService.add({severity: 'error', summary: 'Login', detail: 'Unable to login you'});
     }

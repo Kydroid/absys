@@ -82,7 +82,6 @@ public class UserService {
      * @return
      */
     public User login(String userid) {
-        // TODO
-        return null;
+        return memoryDatabase.stream().filter(user -> user.getId().equals(userid)).findFirst().orElse(null);
     }
 }

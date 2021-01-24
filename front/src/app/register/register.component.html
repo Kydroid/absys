@@ -15,6 +15,14 @@
         <p-calendar id="birthday" [(ngModel)]="user.birthday" required="" name="birthday"></p-calendar>
       </div>
       <div class="p-field">
+        <label for="earthJob">Job</label><br/>
+        <input id="earthJob" pInputText [(ngModel)]="user.earthJob" required="" name="earthJob" type="text" pInputText>
+      </div>
+      <div class="p-field">
+        <label for="earthCountry">Country</label><br/>
+        <input id="earthCountry" pInputText [(ngModel)]="user.earthCountry" required="" name="earthCountry" type="text" pInputText>
+      </div>
+      <div class="p-field">
         <button pButton type="submit" label="Register"></button>
       </div>
     </p-fieldset>

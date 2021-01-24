@@ -25,8 +25,10 @@ public class UserService {
     public User createUser(User user) {
         try {
             // generate key
-            String key = "TODO : generate random string here";
-            user.setId(key);
+            do {
+                String key = User.generateKey();
+                user.setId(key);
+            } while (memoryDatabase.stream().anyMatch(userCur -> userCur.getId().equalsIgnoreCase(user.getId())));
             memoryDatabase.add(user);
             // notify
             webSocketTemplate.convertAndSend("/workflow/states", user);

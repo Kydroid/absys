@@ -23,7 +23,7 @@ export class UserService {
   }
 
   public async register(user: User): Promise<User> {
-    const newUser = await this.apiService.post('user/register', {});
+    const newUser = await this.apiService.post('user/register', user);
     this.currentUser = newUser;
     return newUser;
   }

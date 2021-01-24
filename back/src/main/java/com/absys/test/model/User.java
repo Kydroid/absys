@@ -1,6 +1,9 @@
 package com.absys.test.model;
 
+import org.apache.commons.lang3.RandomStringUtils;
+
 import java.util.Date;
+import java.util.Random;
 
 public class User {
     private String id;
@@ -17,11 +20,19 @@ public class User {
         this.lastname = lastname;
         this.birthday = birthday;
         this.earthCountry = earthCountry;
-        this.state = UserState.DONE;
         this.earthJob = earthJob;
     }
 
     public User() {
+    }
+
+    /**
+     * MARS-51*2 Standard : 4 Letters uppercase + 2 numbers (such as SFES45)
+     * @return
+     */
+    public static String generateKey() {
+        String generatedKey = RandomStringUtils.random(4, true, false);
+        return generatedKey.toUpperCase() + String.format("%02d", new Random().nextInt(99));
     }
 
     public String getId() {

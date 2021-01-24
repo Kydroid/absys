@@ -2,6 +2,7 @@ package com.absys.test.service;
 
 import com.absys.test.model.Criminal;
 import com.absys.test.model.User;
+import com.absys.test.model.UserState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -52,13 +53,27 @@ public class UserService {
      * @return
      */
     public User workflow(String userid) {
-        User user = null;
+        User user = findUserById(userid).orElseThrow(() -> new RuntimeException("Error : Unable to find user."));
         // fetch user from memory database
 
         // next step on workflow
         // CREATED -> EARTH_CONTROL -> MARS_CONTROL -> DONE
         // Check criminal list during "EARTH_CONTROL" state, if the user is in the list, set state to REFUSED
-        // TODO
+        if (UserState.CREATED.equals(user.getState())) {
+            user.setState(UserState.EARTH_CONTROL);
+        } else if (UserState.EARTH_CONTROL.equals(user.getState())) {
+            if (isUserIsCriminal(user)) {
+                user.setState(UserState.REFUSED);
+            } else {
+                user.setState(UserState.MARS_CONTROL);
+            }
+        } else if (UserState.MARS_CONTROL.equals(user.getState())) {
+            if (isDuplicateUser(user)) {
+                user.setState(UserState.REFUSED);
+            } else {
+                user.setState(UserState.DONE);
+            }
+        }
         // don't forget to use earthCriminalDatabase and UserState
 
         // send update to all users
@@ -82,6 +97,40 @@ public class UserService {
      * @return
      */
     public User login(String userid) {
-        return memoryDatabase.stream().filter(user -> user.getId().equals(userid)).findFirst().orElse(null);
+        return findUserById(userid).orElse(null);
+    }
+
+    private Optional<User> findUserById(String userid) {
+        return memoryDatabase.stream().filter(user -> user.getId().equals(userid)).findFirst();
+    }
+
+    /**
+     * A user is a criminal whether he exists on the earthCriminalDatabase
+     * with same firstname + lastname and not allowed on mars
+     * @param user
+     * @return
+     */
+    private boolean isUserIsCriminal(User user) {
+        return earthCriminalDatabase.stream().anyMatch(criminal -> {
+            return criminal.getFirstname().equalsIgnoreCase(user.getFirstname())
+                    && criminal.getLastname().equalsIgnoreCase(user.getLastname())
+                    && criminal.isNotAllowedToMars();
+        });
+    }
+
+    /**
+     * check if the user already exists in DB with same firstname + lastname + birthday.
+     * And already DONE, otherwise, both users will be refused.
+     * @param user
+     * @return
+     */
+    private boolean isDuplicateUser(User user) {
+        return memoryDatabase.stream().anyMatch(userCur -> {
+            return userCur.getState().equals(UserState.DONE)
+                    && userCur.getFirstname().equalsIgnoreCase(user.getFirstname())
+                    && userCur.getLastname().equalsIgnoreCase(user.getLastname())
+                    && userCur.getBirthday().compareTo(user.getBirthday()) == 0
+                    && !userCur.getId().equals(user.getId());
+        });
     }
 }

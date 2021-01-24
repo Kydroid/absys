@@ -35,6 +35,14 @@ public class User {
         return generatedKey.toUpperCase() + String.format("%02d", new Random().nextInt(99));
     }
 
+    public boolean isValidForCreate() {
+        return this.firstname != null && !this.firstname.isEmpty()
+                && this.lastname != null && !this.lastname.isEmpty()
+                && this.earthCountry != null && !this.earthCountry.isEmpty()
+                && this.earthJob != null && !this.earthJob.isEmpty()
+                && this.birthday != null;
+    }
+
     public String getId() {
         return id;
     }

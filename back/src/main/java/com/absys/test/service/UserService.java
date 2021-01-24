@@ -23,6 +23,9 @@ public class UserService {
      * @return
      */
     public User createUser(User user) {
+        if (!user.isValidForCreate()) {
+            throw new RuntimeException("All fields must be fill.");
+        }
         try {
             // generate key
             do {
